@@ -120,6 +120,6 @@ RUN set -xe && \
 
     rm -rf /var/lib/apt/lists/* && \
     docker-php-source delete && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
     rm -rf /tmp/pear ~/.pearrc

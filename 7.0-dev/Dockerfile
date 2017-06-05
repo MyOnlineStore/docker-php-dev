@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.0-fpm
 
 RUN set -xe && \
     buildDeps=" \
@@ -108,9 +108,11 @@ RUN set -xe && \
         xsl \
         zip && \
 
+    pecl install xdebug && \
     pecl install memcached && \
     pecl install imagick && \
     docker-php-ext-enable \
+        xdebug \
         memcached \
         imagick && \
 
@@ -122,6 +124,6 @@ RUN set -xe && \
 
     rm -rf /var/lib/apt/lists/* /opt/xhprof && \
     docker-php-source delete && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
     rm -rf /tmp/pear ~/.pearrc

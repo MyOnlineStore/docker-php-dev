@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:5.5-fpm
 
 RUN set -xe && \
     buildDeps=" \
@@ -118,6 +118,6 @@ RUN set -xe && \
 
     rm -rf /var/lib/apt/lists/* && \
     docker-php-source delete && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
     rm -rf /tmp/pear ~/.pearrc

@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:5.6-fpm
 
 RUN set -xe && \
     buildDeps=" \
@@ -108,20 +108,18 @@ RUN set -xe && \
         xsl \
         zip && \
 
-    pecl install memcached && \
+    pecl install xdebug && \
+    pecl install memcached-2.2.0 && \
     pecl install imagick && \
+    pecl install xhprof-0.9.4 && \
     docker-php-ext-enable \
+        xdebug \
         memcached \
-        imagick && \
+        imagick \
+        xhprof && \
 
-    git clone --depth=1 https://github.com/longxinH/xhprof.git /opt/xhprof && \
-    cd /opt/xhprof/extension && \
-        phpize && \
-        /opt/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
-    docker-php-ext-enable xhprof && \
-
-    rm -rf /var/lib/apt/lists/* /opt/xhprof && \
+    rm -rf /var/lib/apt/lists/* && \
     docker-php-source delete && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
     rm -rf /tmp/pear ~/.pearrc
