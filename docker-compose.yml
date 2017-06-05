@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    php5_5:
+        build: php5.5
+
+    php5_5-dev:
+        build: php5.5-dev
+
+    php5_6:
+        build: php5.6
+
+    php5_6-dev:
+        build: php5.6-dev
+
+    php7_0:
+        build: php7.0
+
+    php7_0-dev:
+        build: php7.0-dev
+
+    php7_1:
+        build: php7.1
+
+    php7_1-dev:
+        build: php7.1-dev
