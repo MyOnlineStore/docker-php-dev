@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -qqy \
-    git
+    git \
     php \
     php-fpm \
     php-gmp \
