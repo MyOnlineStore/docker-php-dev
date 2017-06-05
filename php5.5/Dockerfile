@@ -104,7 +104,7 @@ RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
         xsl \
         zip && \
 
-    pecl install memcached && \
+    pecl install memcached-2.2.0 && \
     pecl install imagick && \
     docker-php-ext-enable \
         memcached \
