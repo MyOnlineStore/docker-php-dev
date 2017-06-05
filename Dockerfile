@@ -39,7 +39,9 @@ RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
         # ext-xsl
         libxslt1-dev \
         # pecl-memcached
-        libmemcached-dev zlib1g-dev && \
+        libmemcached-dev zlib1g-dev \
+        # pecl-imagick
+        libmagickwand-dev && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -104,9 +106,11 @@ RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
 
     pecl install xdebug && \
     pecl install memcached && \
+    pecl install imagick && \
     docker-php-ext-enable \
         xdebug \
-        memcached && \
+        memcached \
+        imagick && \
 
     git clone --depth=1 https://github.com/longxinH/xhprof.git /opt/xhprof && \
     cd /opt/xhprof/extension && \
