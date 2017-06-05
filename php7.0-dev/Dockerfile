@@ -1,6 +1,7 @@
 FROM php:7.0-fpm
 
-RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
+RUN set -xe && \
+    buildDeps=" \
         git \
         # ext-bz2
         libbz2-dev \
@@ -41,7 +42,10 @@ RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
         # pecl-memcached
         libmemcached-dev zlib1g-dev \
         # pecl-imagick
-        libmagickwand-dev && \
+        libmagickwand-dev
+    " \
+
+    apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install $buildDeps --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -116,4 +120,9 @@ RUN apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install \
     cd /opt/xhprof/extension && \
         phpize && \
         /opt/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
-    docker-php-ext-enable xhprof
+    docker-php-ext-enable xhprof && \
+
+    docker-php-source delete && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
+    pecl update-channels && \
+    rm -rf /tmp/pear ~/.pearrc
