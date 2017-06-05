@@ -1,51 +1,51 @@
 FROM php:5.5-fpm
 
 RUN set -xe && \
-    buildDeps="
+    buildDeps=" \
         git \
-        # ext-bz2
+        # ext-bz2 \
         libbz2-dev \
-        # ext-enchant
+        # ext-enchant \
         #libenchant-dev \
-        # ext-gd
+        # ext-gd \
         libpng12-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
-        # ext-gmp
+        # ext-gmp \
         libgmp3-dev \
-        # ext-imap
+        # ext-imap \
         #libc-client-dev libkrb5-dev \
         # ext-interbase ext-pdo_firebird
         #firebird-dev \
-        # ext-intl
+        # ext-intl \
         libicu-dev \
-        # ext-ldap
+        # ext-ldap \
         #libldap2-dev \
-        # ext-mcrypt
+        # ext-mcrypt \
         libmcrypt-dev \
-        # ext-pdo_dblib
+        # ext-pdo_dblib \
         #freetds-dev \
-        # ext-oci8 ext-pdo_oci
+        # ext-oci8 ext-pdo_oci \
         #libaio-dev \
-        # ext-pdo_odbc
+        # ext-pdo_odbc \
         #unixodbc-dev \
-        # ext-pdo_pgsql
+        # ext-pdo_pgsql \
         #libpq-dev postgresql-server-dev-all \
-        # ext-pspell
+        # ext-pspell \
         #libpspell-dev \
-        # ext-recode
+        # ext-recode \
         #librecode-dev \
-        # ext-soap ext-wddx ext-xmlrpc
+        # ext-soap ext-wddx ext-xmlrpc \
         libxml2-dev \
-        # ext-tidy
+        # ext-tidy \
         libtidy-dev \
-        # ext-xsl
+        # ext-xsl \
         libxslt1-dev \
-        # pecl-memcached
+        # pecl-memcached \
         libmemcached-dev zlib1g-dev \
-        # pecl-imagick
-        libmagickwand-dev
-    " \
+        # pecl-imagick \
+        libmagickwand-dev \
+    " && \
 
-    apt-get -q update && DEBIAN_FRONTEND=noninteractive apt-get -qy install $buildDeps --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -111,17 +111,14 @@ RUN set -xe && \
     pecl install xdebug && \
     pecl install memcached-2.2.0 && \
     pecl install imagick && \
+    pecl install xhprof-0.9.4 && \
     docker-php-ext-enable \
         xdebug \
         memcached \
-        imagick && \
+        imagick \
+        xhprof && \
 
-    git clone --depth=1 https://github.com/longxinH/xhprof.git /opt/xhprof && \
-    cd /opt/xhprof/extension && \
-        phpize && \
-        /opt/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
-    docker-php-ext-enable xhprof && \
-
+    rm -rf /var/lib/apt/lists/* && \
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
