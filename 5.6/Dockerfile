@@ -128,3 +128,19 @@ RUN set -xe && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
     rm -rf /tmp/pear ~/.pearrc
+
+# this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
+RUN apt-get update && apt-get install -y \
+    mysql-client \
+    imagemagick \
+    jpegoptim \
+    librsvg2-bin \
+    libimage-exiftool-perl \
+    opendkim \
+    opendkim-tools \
+    npm && \
+
+    rm -rf /var/lib/apt/lists/* && \
+
+    ln -s /usr/bin/nodejs /usr/bin/node && \
+    npm install -g bower npm-cache
