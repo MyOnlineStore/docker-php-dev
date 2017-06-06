@@ -3,6 +3,7 @@ FROM php:7.1-fpm
 RUN set -xe && \
     buildDeps=" \
         git \
+        subversion \
         # ext-bz2 \
         libbz2-dev \
         # ext-enchant \
@@ -15,8 +16,8 @@ RUN set -xe && \
         #libc-client-dev libkrb5-dev \
         # ext-interbase ext-pdo_firebird
         #firebird-dev \
-        # ext-intl \
-        libicu-dev \
+        # ext-intl, outdated \
+        #libicu-dev \
         # ext-ldap \
         #libldap2-dev \
         # ext-mcrypt \
@@ -48,6 +49,12 @@ RUN set -xe && \
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
+
+    # ext-intl
+    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/release-55-1 /tmp/libicu && \
+    cd /tmp/libicu/source && \
+    ./runConfigureICU Linux/gcc && \
+    make -j$(nproc) install && \
 
     docker-php-ext-configure bcmath && \
     docker-php-ext-configure bz2 && \
