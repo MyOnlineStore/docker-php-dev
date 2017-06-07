@@ -153,3 +153,9 @@ RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSIO
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
     npm install -g bower npm-cache
+
+RUN apt-get update \
+    && apt-get install -y -q --no-install-recommends \
+        ssmtp \
+    && apt-get clean \
+    && rm -r /var/lib/apt/lists/*
