@@ -1,5 +1,8 @@
 FROM php:7.1-fpm
 
+ENV LIBICU_TAG="release-55-1"
+ENV NODE_VERSION="4.2.6"
+
 RUN set -xe && \
     buildDeps=" \
         git \
@@ -51,7 +54,7 @@ RUN set -xe && \
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
     # ext-intl
-    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/release-55-1 /tmp/libicu && \
+    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/${LIBICU_TAG} /tmp/libicu && \
     cd /tmp/libicu/source && \
     ./runConfigureICU Linux/gcc && \
     make -j$(nproc) install && \
@@ -121,17 +124,16 @@ RUN set -xe && \
         memcached \
         imagick && \
 
-    git clone --depth=1 https://github.com/longxinH/xhprof.git /opt/xhprof && \
-    cd /opt/xhprof/extension && \
+    git clone --depth=1 https://github.com/longxinH/xhprof.git /tmp/xhprof && \
+    cd /tmp/xhprof/extension && \
         phpize && \
-        /opt/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
+        /tmp/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
     docker-php-ext-enable xhprof && \
 
-    rm -rf /var/lib/apt/lists/* /opt/xhprof && \
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
-    rm -rf /tmp/pear ~/.pearrc
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof
 
 # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
 RUN apt-get update && apt-get install -y \
@@ -141,10 +143,11 @@ RUN apt-get update && apt-get install -y \
     librsvg2-bin \
     libimage-exiftool-perl \
     opendkim \
-    opendkim-tools \
-    npm && \
+    opendkim-tools && \
 
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/*
 
-    ln -s /usr/bin/nodejs /usr/bin/node && \
+RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
     npm install -g bower npm-cache

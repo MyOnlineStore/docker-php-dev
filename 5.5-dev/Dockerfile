@@ -1,5 +1,8 @@
 FROM php:5.5-fpm
 
+ENV LIBICU_TAG="release-55-1"
+ENV NODE_VERSION="4.2.6"
+
 RUN set -xe && \
     buildDeps=" \
         git \
@@ -51,7 +54,7 @@ RUN set -xe && \
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
     # ext-intl
-    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/release-55-1 /tmp/libicu && \
+    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/${LIBICU_TAG} /tmp/libicu && \
     cd /tmp/libicu/source && \
     ./runConfigureICU Linux/gcc && \
     make -j$(nproc) install && \
@@ -125,11 +128,10 @@ RUN set -xe && \
         imagick \
         xhprof && \
 
-    rm -rf /var/lib/apt/lists/* && \
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
-    rm -rf /tmp/pear ~/.pearrc
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/*
 
 # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
 RUN apt-get update && apt-get install -y \
@@ -139,10 +141,11 @@ RUN apt-get update && apt-get install -y \
     librsvg2-bin \
     libimage-exiftool-perl \
     opendkim \
-    opendkim-tools \
-    npm && \
+    opendkim-tools && \
 
-    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/lib/apt/lists/*
 
-    ln -s /usr/bin/nodejs /usr/bin/node && \
+RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
     npm install -g bower npm-cache
