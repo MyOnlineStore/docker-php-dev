@@ -13,6 +13,8 @@ RUN set -xe && \
         libtidy-dev \
         # ext-xsl \
         libxslt1-dev \
+        # ext-soap ext-wddx ext-xmlrpc \
+        libxml2-dev \
     " && \
     buildDeps=" \
         git \
@@ -43,8 +45,6 @@ RUN set -xe && \
         #libpspell-dev \
         # ext-recode \
         #librecode-dev \
-        # ext-soap ext-wddx ext-xmlrpc \
-        libxml2-dev \
         # pecl-memcached \
         libmemcached-dev zlib1g-dev \
         # pecl-imagick \
