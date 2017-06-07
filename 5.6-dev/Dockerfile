@@ -4,6 +4,16 @@ ENV LIBICU_TAG="release-55-1"
 ENV NODE_VERSION="4.2.6"
 
 RUN set -xe && \
+    requiredDeps=" \
+        # ext-gd \
+        libpng12-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
+        # ext-mcrypt \
+        libmcrypt-dev \
+        # ext-tidy \
+        libtidy-dev \
+        # ext-xsl \
+        libxslt1-dev \
+    " && \
     buildDeps=" \
         git \
         subversion \
@@ -11,8 +21,6 @@ RUN set -xe && \
         libbz2-dev \
         # ext-enchant \
         #libenchant-dev \
-        # ext-gd \
-        libpng12-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
         # ext-gmp \
         libgmp3-dev \
         # ext-imap \
@@ -23,8 +31,6 @@ RUN set -xe && \
         #libicu-dev \
         # ext-ldap \
         #libldap2-dev \
-        # ext-mcrypt \
-        libmcrypt-dev \
         # ext-pdo_dblib \
         #freetds-dev \
         # ext-oci8 ext-pdo_oci \
@@ -39,17 +45,13 @@ RUN set -xe && \
         #librecode-dev \
         # ext-soap ext-wddx ext-xmlrpc \
         libxml2-dev \
-        # ext-tidy \
-        libtidy-dev \
-        # ext-xsl \
-        libxslt1-dev \
         # pecl-memcached \
         libmemcached-dev zlib1g-dev \
         # pecl-imagick \
         libmagickwand-dev \
     " && \
 
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $buildDeps nullmailer --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $buildDeps $requiredDeps nullmailer --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
