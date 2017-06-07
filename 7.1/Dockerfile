@@ -49,7 +49,7 @@ RUN set -xe && \
         libmagickwand-dev \
     " && \
 
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps nullmailer --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $buildDeps nullmailer --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -134,21 +134,22 @@ RUN set -xe && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
     apt-get clean && \
-    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof && \
 
-# this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
-RUN apt-get update && apt-get install -y \
-    mysql-client \
-    imagemagick \
-    jpegoptim \
-    librsvg2-bin \
-    libimage-exiftool-perl \
-    opendkim \
-    opendkim-tools && \
+    # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        mysql-client \
+        imagemagick \
+        jpegoptim \
+        librsvg2-bin \
+        libimage-exiftool-perl \
+        opendkim \
+        opendkim-tools && \
 
-    rm -rf /var/lib/apt/lists/*
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    rm -rf /var/lib/apt/lists/* && \
 
-RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
+    cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
     npm install --prefix=/usr/local -g npm-cache bower
