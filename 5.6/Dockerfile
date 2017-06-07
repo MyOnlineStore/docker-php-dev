@@ -49,7 +49,7 @@ RUN set -xe && \
         libmagickwand-dev \
     " && \
 
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps ssmtp --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps nullmailer --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
