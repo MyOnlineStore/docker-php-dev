@@ -127,7 +127,7 @@ RUN set -xe && \
         xhprof && \
 
     docker-php-source delete && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
     apt-get clean && \
     rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/*
