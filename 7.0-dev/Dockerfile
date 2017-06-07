@@ -49,7 +49,7 @@ RUN set -xe && \
         libmagickwand-dev \
     " && \
 
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps ssmtp --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -135,6 +135,7 @@ RUN set -xe && \
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
+    apt-get clean && \
     rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof
 
 # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
@@ -153,9 +154,3 @@ RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSIO
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
     npm install -g bower npm-cache
-
-RUN apt-get update \
-    && apt-get install -y -q --no-install-recommends \
-        ssmtp \
-    && apt-get clean \
-    && rm -r /var/lib/apt/lists/*

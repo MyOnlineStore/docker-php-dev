@@ -49,7 +49,7 @@ RUN set -xe && \
         libmagickwand-dev \
     " && \
 
-    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps --no-install-recommends && \
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install $buildDeps ssmtp --no-install-recommends && \
 
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
@@ -131,6 +131,7 @@ RUN set -xe && \
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     pecl update-channels && \
+    apt-get clean && \
     rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/*
 
 # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
