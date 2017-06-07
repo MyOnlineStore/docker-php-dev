@@ -139,6 +139,7 @@ RUN set -xe && \
     # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         mysql-client \
+        git \
         imagemagick \
         jpegoptim \
         librsvg2-bin \
