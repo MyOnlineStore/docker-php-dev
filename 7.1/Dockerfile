@@ -1,7 +1,7 @@
 FROM php:7.1-fpm
 
-ENV LIBICU_TAG="release-55-1"
-ENV NODE_VERSION="4.2.6"
+ENV LIBICU_TAG="release-55-1" \
+    NODE_VERSION="4.2.6"
 
 RUN set -xe && \
     requiredDeps=" \
@@ -126,6 +126,12 @@ RUN set -xe && \
         memcached \
         imagick && \
 
+    git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \
+    cd /tmp/memcache && \
+        phpize && \
+        /tmp/memcache/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
+    docker-php-ext-enable memcache && \
+
     git clone --depth=1 https://github.com/longxinH/xhprof.git /tmp/xhprof && \
     cd /tmp/xhprof/extension && \
         phpize && \
@@ -136,7 +142,7 @@ RUN set -xe && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
     apt-get clean && \
-    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof && \
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof /tmp/memcache && \
 
     # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

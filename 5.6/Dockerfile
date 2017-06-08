@@ -1,7 +1,7 @@
 FROM php:5.6-fpm
 
-ENV LIBICU_TAG="release-55-1"
-ENV NODE_VERSION="4.2.6"
+ENV LIBICU_TAG="release-55-1" \
+    NODE_VERSION="4.2.6"
 
 RUN set -xe && \
     requiredDeps=" \
@@ -120,10 +120,12 @@ RUN set -xe && \
         xsl \
         zip && \
 
+    pecl install memcache && \
     pecl install memcached-2.2.0 && \
     pecl install imagick && \
     pecl install xhprof-0.9.4 && \
     docker-php-ext-enable \
+        memcache \
         memcached \
         imagick \
         xhprof && \
