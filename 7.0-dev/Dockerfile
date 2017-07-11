@@ -163,4 +163,5 @@ RUN set -xe && \
     cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
     ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
-    npm install --prefix=/usr/local -g npm-cache bower
+    npm install --prefix=/usr/local -g npm-cache bower && \
+    npm rebuild node-sass
