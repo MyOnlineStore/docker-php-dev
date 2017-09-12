@@ -153,7 +153,8 @@ RUN set -xe && \
         librsvg2-bin \
         libimage-exiftool-perl \
         opendkim \
-        opendkim-tools && \
+        opendkim-tools \
+        supervisor && \
 
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/* && \
