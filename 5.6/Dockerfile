@@ -15,6 +15,8 @@ RUN set -xe && \
         libxslt1-dev \
         # ext-soap ext-wddx ext-xmlrpc \
         libxml2-dev \
+        # ext-imap
+        libc-client2007e \
     " && \
     buildDeps=" \
         git \
@@ -26,7 +28,7 @@ RUN set -xe && \
         # ext-gmp \
         libgmp3-dev \
         # ext-imap \
-        #libc-client-dev libkrb5-dev \
+        libc-client-dev libkrb5-dev \
         # ext-interbase ext-pdo_firebird
         #firebird-dev \
         # ext-intl, outdated \
@@ -73,6 +75,7 @@ RUN set -xe && \
         --with-png-dir=/usr/include \
         --with-webp-dir=/usr/include && \
     docker-php-ext-configure gmp && \
+    docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-configure intl && \
     docker-php-ext-configure json && \
     docker-php-ext-configure mcrypt && \
@@ -101,6 +104,7 @@ RUN set -xe && \
         gd \
         gmp \
         gettext \
+        imap \
         intl \
         json \
         mcrypt \
