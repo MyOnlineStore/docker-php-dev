@@ -1,7 +1,7 @@
 FROM php:7.1-fpm
 
 ENV LIBICU_TAG="release-55-1" \
-    NODE_VERSION="4.2.6"
+    NODE_VERSION="8.9.1"
 
 RUN set -xe && \
     requiredDeps=" \
