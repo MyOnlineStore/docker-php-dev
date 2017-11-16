@@ -1,12 +1,12 @@
-FROM php:5.5-fpm
+FROM php:7.2-rc-fpm
 
 ENV LIBICU_TAG="release-55-1" \
-    NODE_VERSION="0.10.25"
+    NODE_VERSION="8.9.1"
 
 RUN set -xe && \
     requiredDeps=" \
         # ext-gd \
-        libpng12-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
+        libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
         # ext-mcrypt \
         libmcrypt-dev \
         # ext-tidy \
@@ -125,22 +125,24 @@ RUN set -xe && \
         zip && \
 
     pecl install xdebug && \
-    pecl install memcache && \
-    pecl install memcached-2.2.0 && \
+    pecl install memcached && \
     pecl install imagick && \
-    pecl install xhprof-0.9.4 && \
     docker-php-ext-enable \
         xdebug \
-        memcache \
         memcached \
-        imagick \
-        xhprof && \
+        imagick && \
+
+    git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \
+    cd /tmp/memcache && \
+        phpize && \
+        /tmp/memcache/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
+    docker-php-ext-enable memcache && \
 
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
     apt-get clean && \
-    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* && \
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/memcache && \
 
     # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

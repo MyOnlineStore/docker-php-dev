@@ -136,17 +136,11 @@ RUN set -xe && \
         /tmp/memcache/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
     docker-php-ext-enable memcache && \
 
-    git clone --depth=1 https://github.com/longxinH/xhprof.git /tmp/xhprof && \
-    cd /tmp/xhprof/extension && \
-        phpize && \
-        /tmp/xhprof/extension/configure --with-php-config=$(which php-config); make -j$(nproc) install && \
-    docker-php-ext-enable xhprof && \
-
     docker-php-source delete && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps && \
     pecl update-channels && \
     apt-get clean && \
-    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/xhprof /tmp/memcache && \
+    rm -rf /tmp/pear ~/.pearrc /tmp/libicu /var/lib/apt/lists/* /tmp/memcache && \
 
     # this shouldn't be included in the base image, but as the legacy implementation lives on there was no other option
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
