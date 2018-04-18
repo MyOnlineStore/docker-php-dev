@@ -1,14 +1,12 @@
-FROM php:7.2-rc-fpm
+FROM php:7.2-fpm
 
-ENV LIBICU_TAG="release-55-1" \
+ENV LIBICU_TAG="release-60-2" \
     NODE_VERSION="8.9.1"
 
 RUN set -xe && \
     requiredDeps=" \
         # ext-gd \
         libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
-        # ext-mcrypt \
-        libmcrypt-dev \
         # ext-tidy \
         libtidy-dev \
         # ext-xsl \
@@ -58,7 +56,7 @@ RUN set -xe && \
     ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/ && \
 
     # ext-intl
-    svn export --non-interactive http://source.icu-project.org/repos/icu/icu/tags/${LIBICU_TAG} /tmp/libicu && \
+    svn export --non-interactive http://source.icu-project.org/repos/icu/tags/${LIBICU_TAG}/icu4c /tmp/libicu && \
     cd /tmp/libicu/source && \
     ./runConfigureICU Linux/gcc && \
     make -j$(nproc) install && \
@@ -78,7 +76,6 @@ RUN set -xe && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
     docker-php-ext-configure intl && \
     docker-php-ext-configure json && \
-    docker-php-ext-configure mcrypt && \
     docker-php-ext-configure mysqli && \
     docker-php-ext-configure opcache && \
     docker-php-ext-configure pcntl && \
@@ -107,7 +104,6 @@ RUN set -xe && \
         imap \
         intl \
         json \
-        mcrypt \
         mysqli \
         opcache \
         pcntl \
