@@ -152,6 +152,10 @@ RUN set -xe && \
         opendkim-tools \
         supervisor && \
 
+    # workaround for https://github.com/imagemin/mozjpeg-bin/issues/18
+    curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
+    dpkg -i /tmp/libpng12.deb && \
+
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/* && \
 
