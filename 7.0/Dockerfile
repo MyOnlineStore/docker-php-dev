@@ -125,6 +125,7 @@ RUN set -xe && \
         zip && \
 
     pecl install memcached && \
+    pecl install redis && \
     pecl install imagick && \
     docker-php-ext-enable \
         memcached \

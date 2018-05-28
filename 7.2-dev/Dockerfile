@@ -122,6 +122,7 @@ RUN set -xe && \
 
     pecl install xdebug && \
     pecl install memcached && \
+    pecl install redis && \
     pecl install imagick && \
     docker-php-ext-enable \
         xdebug \
