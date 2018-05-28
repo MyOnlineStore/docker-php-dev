@@ -127,6 +127,7 @@ RUN set -xe && \
     docker-php-ext-enable \
         xdebug \
         memcached \
+        redis \
         imagick && \
 
     git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \

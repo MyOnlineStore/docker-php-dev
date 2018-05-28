@@ -6,7 +6,7 @@ ENV LIBICU_TAG="release-55-1" \
 RUN set -xe && \
     requiredDeps=" \
         # ext-gd \
-        libpng12-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
+        libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
         # ext-mcrypt \
         libmcrypt-dev \
         # ext-tidy \
@@ -129,6 +129,7 @@ RUN set -xe && \
     pecl install imagick && \
     docker-php-ext-enable \
         memcached \
+        redis \
         imagick && \
 
     git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \
@@ -154,6 +155,10 @@ RUN set -xe && \
         opendkim \
         opendkim-tools \
         supervisor && \
+
+    # workaround for https://github.com/imagemin/mozjpeg-bin/issues/18
+    curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
+    dpkg -i /tmp/libpng12.deb && \
 
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
     rm -rf /var/lib/apt/lists/* && \

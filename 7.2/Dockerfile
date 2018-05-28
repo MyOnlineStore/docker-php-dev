@@ -125,6 +125,7 @@ RUN set -xe && \
     pecl install imagick && \
     docker-php-ext-enable \
         memcached \
+        redis \
         imagick && \
 
     git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \
