@@ -36,6 +36,14 @@ RUN apt-get update && \
       php-zip \
       # This shouldn't be included in the base image, but as legacy implementations lives on there was no other option :-(
       nodejs npm \
+      # Gearman tools
+      php-cli \
+      imagemagick \
+      jpegoptim \
+      librsvg2-bin \
+      libimage-exiftool-perl \
+      opendkim \
+      opendkim-tools \
       # I don't think the "build-tools" should be part of the base image either, but here we go anyways...
       curl git make g++ mysql-client && \
     rm -r /var/lib/apt/lists/* && \
