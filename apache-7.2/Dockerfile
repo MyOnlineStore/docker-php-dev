@@ -66,7 +66,7 @@ RUN a2dismod access_compat && \
     a2dissite default-ssl && \
     a2disconf other-vhosts-access-log serve-cgi-bin && \
     a2enmod headers mpm_prefork ssl && \
-    a2enconf php security symfony logs
+    a2enconf security symfony logs
 
 WORKDIR /srv/app
 
