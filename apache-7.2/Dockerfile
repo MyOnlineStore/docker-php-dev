@@ -42,11 +42,15 @@ RUN apt-get update && \
       jpegoptim \
       librsvg2-bin \
       libimage-exiftool-perl \
+      librdkafka-dev \
       opendkim \
       opendkim-tools \
       # I don't think the "build-tools" should be part of the base image either, but here we go anyways...
       curl git make g++ mysql-client && \
     rm -r /var/lib/apt/lists/* && \
+    # rdkafka
+    pecl install rdkafka && \
+    docker-php-ext-enable rdkafka && \
     # Webpack: work-around for https://github.com/imagemin/mozjpeg-bin/issues/18
     curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
     dpkg -i /tmp/libpng12.deb && \

@@ -49,6 +49,8 @@ RUN set -xe && \
         libmemcached-dev zlib1g-dev \
         # pecl-imagick \
         libmagickwand-dev \
+        # pecl-rdkafka \
+        librdkafka-dev \
     " && \
 
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $buildDeps $requiredDeps nullmailer --no-install-recommends && \
@@ -124,11 +126,13 @@ RUN set -xe && \
     pecl install memcached && \
     pecl install redis && \
     pecl install imagick && \
+    pecl install rdkafka && \
     docker-php-ext-enable \
         xdebug \
         memcached \
         redis \
-        imagick && \
+        imagick \
+        rdkafka && \
 
     git clone --depth=1 https://github.com/websupport-sk/pecl-memcache.git /tmp/memcache && \
     cd /tmp/memcache && \
