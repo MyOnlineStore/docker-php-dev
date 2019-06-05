@@ -17,6 +17,8 @@ RUN set -xe && \
         libxml2-dev \
         # ext-imap
         libc-client2007e \
+        # pecl-rdkafka
+        librdkafka1 \
     " && \
     buildDeps=" \
         git \
