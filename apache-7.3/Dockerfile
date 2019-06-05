@@ -69,7 +69,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     phpenmod rdkafka && \
-    apt-get --purge -y remove php-pear php${PHP_VERSION}-dev && \
+    apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Install NodeJS
