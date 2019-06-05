@@ -1,13 +1,7 @@
 FROM ubuntu:18.04
 
-ARG PHP_VERSION="7.2"
+ARG PHP_VERSION="7.3"
 ARG NODE_VERSION="8.16.0"
-
-ENV APACHE_RUN_DIR="/var/run/apache2"
-ENV APACHE_PID_FILE="${APACHE_RUN_DIR}/apache2.pid"
-ENV APACHE_RUN_USER="www-data"
-ENV APACHE_RUN_GROUP="www-data"
-ENV APACHE_LOG_DIR="/var/log/apache2"
 
 # Add alternative PHP repository
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -40,9 +34,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-xsl \
     php${PHP_VERSION}-zip \
     # Install PHP SAPI
-    ca-certificates \
-    apache2 \
-    libapache2-mod-php${PHP_VERSION} \
+    php7.3-fpm \
     # Install Gearman tools
     imagemagick \
     jpegoptim \
@@ -69,7 +61,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     phpenmod rdkafka && \
-    apt-get --purge -y remove php-pear php${PHP_VERSION}-dev && \
+    apt-get --purge remove php-pear php${PHP_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Install NodeJS
@@ -81,17 +73,46 @@ RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSIO
     dpkg -i /tmp/libpng12.deb && \
     rm /tmp/libpng12.deb
 
-COPY configs/* /etc/apache2/conf-available/
-COPY mods/* /etc/apache2/mods-available/
+RUN set -ex \
+    && cd /etc/php/7.3/fpm \
+    && if [ -d php-fpm.d ]; then \
+        # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
+        sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
+        cp php-fpm.d/www.conf.default php-fpm.d/www.conf; \
+    else \
+        # PHP 5.x doesn't use "include=" by default, so we'll create our own simple config that mimics PHP 7+ for consistency
+        mkdir php-fpm.d; \
+        cp pool.d/www.conf php-fpm.d/www.conf; \
+        { \
+            echo '[global]'; \
+            echo 'include=/etc/php/7.3/fpm/php-fpm.d/*.conf'; \
+        } | tee php-fpm.conf; \
+    fi \
+    && { \
+        echo '[global]'; \
+        echo 'error_log = /proc/self/fd/2'; \
+        echo; echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; echo 'log_limit = 8192'; \
+        echo; \
+        echo '[www]'; \
+        echo '; if we send this to /proc/self/fd/1, it never appears'; \
+        echo 'access.log = /proc/self/fd/2'; \
+        echo; \
+        echo 'clear_env = no'; \
+        echo; \
+        echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
+        echo 'catch_workers_output = yes'; \
+        echo 'decorate_workers_output = no'; \
+    } | tee php-fpm.d/docker.conf \
+    && { \
+        echo '[global]'; \
+        echo 'daemonize = no'; \
+        echo; \
+        echo '[www]'; \
+        echo 'listen = 9000'; \
+} | tee php-fpm.d/zz-docker.conf
 
-RUN a2dismod access_compat && \
-    a2dissite default-ssl && \
-    a2disconf other-vhosts-access-log serve-cgi-bin && \
-    a2enmod headers mpm_prefork ssl && \
-    a2enconf security symfony logs
+STOPSIGNAL SIGQUIT
 
-WORKDIR /srv/app
+EXPOSE 9000
 
-EXPOSE 80
-
-CMD ["apache2", "-DFOREGROUND"]
+CMD ["php-fpm7.3"]
