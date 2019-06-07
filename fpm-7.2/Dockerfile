@@ -40,8 +40,10 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     librdkafka-dev \
     librdkafka1 \
     php-pear \
-    php${PHP_VERSION}-dev && \
-    pecl install rdkafka && \
+    php${PHP_VERSION}-dev \
+    make \
+    g++ && \
+    pecl install rdkafka make g++ && \
     echo "; configuration for php rdkafka module" > /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
@@ -53,11 +55,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     librdkafka-dev \
     librdkafka1 \
     php-pear \
-    php${PHP_VERSION}-dev && \
+    php${PHP_VERSION}-dev \
+    make \
+    g++ && \
     pecl install xdebug && \
     echo "; configuration for php xdebug module" > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
     echo "zend_extension=xdebug.so" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
-    apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
+    apt-get remove --purge -y php-pear php${PHP_VERSION}-dev make g++ && \
     rm -rf /var/lib/apt/lists/*
 
 # Disable all non-core php modules by default
