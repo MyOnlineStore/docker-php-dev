@@ -47,8 +47,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     make \
     g++ \
     mysql-client && \
-    rm -rf /var/lib/apt/lists/* && \
-    phpdismod bcmath bz2 curl gd gmp imagick imap intl mbstring memcache memcached pdo mysqli mysqlnd readline redis soap tidy xml zip
+    rm -rf /var/lib/apt/lists/*
 
 # Install Kafka PECL extension
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -83,6 +82,21 @@ RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSIO
     curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
     dpkg -i /tmp/libpng12.deb && \
     rm /tmp/libpng12.deb
+
+# Disable all non-core php modules by default
+RUN phpdismod \
+    bcmath bz2 \
+    curl \
+    gd gmp \
+    imagick imap intl \
+    mbstring memcache memcached \
+    pdo \
+    mysqli mysqlnd \
+    rdkafka readline redis \
+    soap \
+    tidy \
+    xdebug xml \
+    zip
 
 RUN set -ex \
     && cd /etc/php/7.3/fpm \
