@@ -31,7 +31,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-tidy \
     php${PHP_VERSION}-tokenizer \
     php${PHP_VERSION}-xml \
-    php${PHP_VERSION}-xsl \
     php${PHP_VERSION}-zip \
     # Install PHP SAPI
     php7.3-fpm \
@@ -48,7 +47,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     make \
     g++ \
     mysql-client && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    phpdismod bcmath bz2 curl gd gmp imagick imap intl mbstring memcache memcached pdo mysqli mysqlnd readline redis soap tidy xml zip
 
 # Install Kafka PECL extension
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -60,18 +60,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "; configuration for php rdkafka module" > /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
-    phpenmod rdkafka && \
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
-
-# Install NodeJS
-RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
-    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
-    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
-    # Webpack: work-around for https://github.com/imagemin/mozjpeg-bin/issues/18
-    curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
-    dpkg -i /tmp/libpng12.deb && \
-    rm /tmp/libpng12.deb
 
 # Install xdebug PECL extension
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -84,6 +74,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "zend_extension=xdebug.so" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
+
+# Install NodeJS
+RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
+    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
+    # Webpack: work-around for https://github.com/imagemin/mozjpeg-bin/issues/18
+    curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
+    dpkg -i /tmp/libpng12.deb && \
+    rm /tmp/libpng12.deb
 
 RUN set -ex \
     && cd /etc/php/7.3/fpm \
