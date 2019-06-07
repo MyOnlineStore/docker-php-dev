@@ -32,7 +32,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-zip \
     # Install PHP SAPI
-    php${PHP_VERSION}-fpm && \
+    php${PHP_VERSION}-fpm \
+    # Install misc tools
+    ca-certificates \
+    unzip \
+    curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Kafka PECL extension
