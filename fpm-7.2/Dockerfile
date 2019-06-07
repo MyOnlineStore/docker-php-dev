@@ -33,7 +33,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-zip \
     # Install PHP SAPI
-    php7.3-fpm \
+    php${PHP_VERSION}-fpm \
     # Install Gearman tools
     imagemagick \
     jpegoptim \
@@ -84,7 +84,7 @@ RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSIO
     rm /tmp/libpng12.deb
 
 # Disable all non-core php modules by default
-RUN phpdismod \
+RUN phpdismod -s ALL \
     bcmath bz2 \
     curl \
     gd gmp \
@@ -99,7 +99,7 @@ RUN phpdismod \
     zip
 
 RUN set -ex \
-    && cd /etc/php/7.3/fpm \
+    && cd /etc/php/${PHP_VERSION}/fpm \
     && if [ -d php-fpm.d ]; then \
         # for some reason, upstream's php-fpm.conf.default has "include=NONE/etc/php-fpm.d/*.conf"
         sed 's!=NONE/!=!g' php-fpm.conf.default | tee php-fpm.conf > /dev/null; \
@@ -110,7 +110,7 @@ RUN set -ex \
         cp pool.d/www.conf php-fpm.d/www.conf; \
         { \
             echo '[global]'; \
-            echo 'include=/etc/php/7.3/fpm/php-fpm.d/*.conf'; \
+            echo 'include=/etc/php/${PHP_VERSION}/fpm/php-fpm.d/*.conf'; \
         } | tee php-fpm.conf; \
     fi \
     && { \
@@ -140,4 +140,4 @@ STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
 
-CMD ["php-fpm7.3"]
+CMD ["php-fpm${PHP_VERSION}"]
