@@ -1,7 +1,6 @@
 FROM ubuntu:18.04
 
 ARG PHP_VERSION="7.2"
-ARG NODE_VERSION="8.16.0"
 
 # Add alternative PHP repository
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -33,20 +32,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-zip \
     # Install PHP SAPI
-    php${PHP_VERSION}-fpm \
-    # Install Gearman tools
-    imagemagick \
-    jpegoptim \
-    librsvg2-bin \
-    libimage-exiftool-perl \
-    opendkim \
-    opendkim-tools \
-    # I don't think the "build-tools" should be part of the base image either, but here we go anyways...
-    curl \
-    git \
-    make \
-    g++ \
-    mysql-client && \
+    php${PHP_VERSION}-fpm && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Kafka PECL extension
@@ -73,15 +59,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "zend_extension=xdebug.so" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
     rm -rf /var/lib/apt/lists/*
-
-# Install NodeJS
-RUN cd /opt && curl https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz | tar xz && \
-    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/node /usr/bin/node && \
-    ln -s /opt/node-v${NODE_VERSION}-linux-x64/bin/npm /usr/bin/npm && \
-    # Webpack: work-around for https://github.com/imagemin/mozjpeg-bin/issues/18
-    curl "http://ppa.launchpad.net/hiberis/ppa/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.27-1ubuntu1~ppa1_amd64.deb" -o /tmp/libpng12.deb && \
-    dpkg -i /tmp/libpng12.deb && \
-    rm /tmp/libpng12.deb
 
 # Disable all non-core php modules by default
 RUN phpdismod -s ALL \
