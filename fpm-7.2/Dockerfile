@@ -1,6 +1,7 @@
 FROM ubuntu:18.04
 
 ARG PHP_VERSION="7.2"
+ENV PHP_VERSION=${PHP_VERSION}
 
 # Add alternative PHP repository
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
