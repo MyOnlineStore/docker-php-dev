@@ -52,7 +52,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/pear
 
 # Install xdebug PECL extension
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -66,7 +66,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     echo "; configuration for php xdebug module" > /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
     echo "zend_extension=xdebug.so" >> /etc/php/${PHP_VERSION}/mods-available/xdebug.ini && \
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev make g++ && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* /tmp/pear
 
 # Disable all non-core php modules by default
 RUN phpdismod -s ALL \
