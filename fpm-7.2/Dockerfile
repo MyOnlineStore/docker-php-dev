@@ -122,4 +122,6 @@ STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
 
-CMD ["php-fpm${PHP_VERSION}"]
+RUN ln -sv /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
+
+CMD ["php-fpm"]
