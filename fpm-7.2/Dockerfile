@@ -48,17 +48,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     php${PHP_VERSION}-dev \
     make \
     g++ && \
-    pecl install rdkafka make g++ && \
+    pecl install rdkafka && \
     echo "; configuration for php rdkafka module" > /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "; priority=20" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
     echo "extension=rdkafka.so" >> /etc/php/${PHP_VERSION}/mods-available/rdkafka.ini && \
-    apt-get remove --purge -y php-pear php${PHP_VERSION}-dev && \
+    apt-get remove --purge -y librdkafka-dev php-pear php${PHP_VERSION}-dev make g++ && \
     rm -rf /var/lib/apt/lists/* /tmp/pear
 
 # Install xdebug PECL extension
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    librdkafka-dev \
-    librdkafka1 \
     php-pear \
     php${PHP_VERSION}-dev \
     make \
