@@ -67,18 +67,25 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     apt-get remove --purge -y php-pear php${PHP_VERSION}-dev make g++ && \
     rm -rf /var/lib/apt/lists/* /tmp/pear
 
-# Disable all non-core php modules by default
+# Disable all php modules by default
 RUN phpdismod -s ALL \
     bcmath bz2 \
-    curl \
-    gd gmp \
+    calendar ctype curl \
+    dom \
+    exif \
+    fileinfo ftp \
+    gd gettext gmp \
     imagick imap intl \
+    json \
     mbstring memcache memcached mysqli mysqlnd \
+    opcache \
     pdo \
     rdkafka readline redis \
-    soap \
+    phar \
+    simplexml soap \
     tidy \
-    xdebug xml \
+    wddx \
+    xdebug xml xmlreader xmlwriter xsl \
     zip
 
 RUN set -ex \
