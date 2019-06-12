@@ -76,12 +76,10 @@ RUN phpdismod -s ALL \
     fileinfo ftp \
     gd gettext gmp \
     imagick imap intl \
-    json \
     mbstring memcache memcached mysqli mysqlnd \
     opcache \
     pdo pdo_mysql \
     rdkafka readline redis \
-    phar \
     simplexml soap \
     tidy \
     wddx \
