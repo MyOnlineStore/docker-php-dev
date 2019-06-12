@@ -115,8 +115,9 @@ RUN set -ex \
         echo; \
         echo '[www]'; \
         echo 'listen = 9000'; \
-} | tee php-fpm.d/zz-docker.conf \
-    && /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
+} | tee php-fpm.d/zz-docker.conf
+
+RUN /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
 
 STOPSIGNAL SIGQUIT
 
