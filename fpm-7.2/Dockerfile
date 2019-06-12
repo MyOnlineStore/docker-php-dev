@@ -73,9 +73,8 @@ RUN phpdismod -s ALL \
     curl \
     gd gmp \
     imagick imap intl \
-    mbstring memcache memcached \
+    mbstring memcache memcached mysqli mysqlnd \
     pdo \
-    mysqli mysqlnd \
     rdkafka readline redis \
     soap \
     tidy \
@@ -116,12 +115,11 @@ RUN set -ex \
         echo; \
         echo '[www]'; \
         echo 'listen = 9000'; \
-} | tee php-fpm.d/zz-docker.conf
+} | tee php-fpm.d/zz-docker.conf \
+    && /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
 
 STOPSIGNAL SIGQUIT
 
 EXPOSE 9000
-
-RUN ln -sv /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm
 
 CMD ["php-fpm"]
