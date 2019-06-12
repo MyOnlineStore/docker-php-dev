@@ -79,7 +79,7 @@ RUN phpdismod -s ALL \
     json \
     mbstring memcache memcached mysqli mysqlnd \
     opcache \
-    pdo \
+    pdo pdo_mysql \
     rdkafka readline redis \
     phar \
     simplexml soap \
