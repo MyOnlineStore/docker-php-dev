@@ -60,7 +60,7 @@ RUN apt-get update && \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 binutils \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Remove PECL/package manager leftovers
