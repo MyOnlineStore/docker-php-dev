@@ -60,8 +60,8 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # Remove build dependencies
  && apk del --no-network .build-deps \
     # Remove PECL leftovers
- && rm -rf /tmp/pear ~/.pearrc
+ && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings
- && mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini \
+ && mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
