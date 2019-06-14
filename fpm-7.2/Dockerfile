@@ -1,5 +1,7 @@
 FROM php:7.2-fpm
 
+ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
+
     # Install dependencies
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
@@ -9,8 +11,6 @@ RUN apt-get update && \
     libgmp-dev \
     # ext-imagick
     libmagickwand-dev \
-    # ext-intl
-    libicu-dev \
     # ext-memcached
     libmemcached-dev zlib1g-dev \
     # ext-rdkafka
@@ -19,7 +19,12 @@ RUN apt-get update && \
     libtidy-dev \
     # ext-zip
     libzip-dev \
- && rm -rf /var/lib/apt/lists/* \
+    # Install libicu library
+ && curl -L ${ICU4C_SRC} | tar xz -C /opt \
+ && cd /opt/icu/source \
+ && ./runConfigureICU Linux/gcc \
+ && make -j$(nproc) install \
+ && rm -rf /opt/icu \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \

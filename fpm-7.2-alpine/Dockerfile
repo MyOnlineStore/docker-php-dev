@@ -1,5 +1,7 @@
 FROM php:7.2-fpm-alpine
 
+ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
+
     # Install dependencies
 RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-gd
@@ -8,8 +10,6 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     gmp-dev \
     # ext-imagick
     imagemagick-dev libtool \
-    # ext-intl
-    icu-dev \
     # ext-memcached
     libmemcached-dev zlib-dev \
     # ext-rdkafka
@@ -18,6 +18,12 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     tidyhtml-dev \
     # ext-zip
     libzip-dev \
+    # Install libicu library
+ && curl -L ${ICU4C_SRC} | tar xz -C /opt \
+ && cd /opt/icu/source \
+ && ./runConfigureICU Linux/gcc \
+ && make -j$(nproc) install \
+ && rm -rf /opt/icu \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
