@@ -1,21 +1,22 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.3-fpm
 
 ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
 
     # Install dependencies
-RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
     # ext-gd
-    freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libwebp-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
     # ext-gmp
-    gmp-dev \
+    libgmp-dev \
     # ext-imagick
-    imagemagick-dev libtool \
+    libmagickwand-dev \
     # ext-memcached
-    libmemcached-dev zlib-dev \
+    libmemcached-dev zlib1g-dev \
     # ext-rdkafka
     librdkafka-dev \
     # ext-tidy
-    tidyhtml-dev \
+    libtidy-dev \
     # ext-zip
     libzip-dev \
     # Install libicu library
@@ -56,17 +57,19 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
  && pecl install rdkafka \
  && pecl install redis \
  && pecl install xdebug \
-    # Install/Keep runtime dependencies
- && apk add --no-cache \
-    $( \
-        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
-        | tr ',' '\n' \
-        | sort -u \
-        | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-    ) \
+    # Keep runtime dependencies
+ && apt-mark auto '.*' > /dev/null \
+ && find /usr/local -type f -executable -exec ldd '{}' ';' \
+    | awk '/=>/ { print $(NF-1) }' \
+    | sort -u \
+    | xargs -r dpkg-query --search \
+    | cut -d: -f1 \
+    | sort -u \
+    | xargs -r apt-mark manual \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 binutils \
     # Remove build dependencies
- && apk del --no-network .build-deps \
-    # Remove PECL leftovers
+ && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    # Remove PECL/package manager leftovers
  && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \

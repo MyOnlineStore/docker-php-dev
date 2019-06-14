@@ -25,6 +25,7 @@ RUN apt-get update && \
  && ./runConfigureICU Linux/gcc \
  && make -j$(nproc) install \
  && rm -rf /opt/icu \
+ && cd / \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
