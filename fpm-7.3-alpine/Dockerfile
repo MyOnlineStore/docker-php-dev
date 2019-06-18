@@ -14,6 +14,8 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     libmemcached-dev zlib-dev \
     # ext-rdkafka
     librdkafka-dev \
+    # ext-soap
+    libxml2-dev \
     # ext-tidy
     tidyhtml-dev \
     # ext-zip
@@ -34,6 +36,7 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure soap \
  && docker-php-ext-configure sockets \
  && docker-php-ext-configure tidy \
  && docker-php-ext-configure zip \
@@ -47,6 +50,7 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     opcache \
     pcntl \
     pdo_mysql \
+    soap \
     sockets \
     tidy \
     zip \

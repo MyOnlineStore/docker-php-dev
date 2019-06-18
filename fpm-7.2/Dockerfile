@@ -15,6 +15,8 @@ RUN apt-get update && \
     libmemcached-dev zlib1g-dev \
     # ext-rdkafka
     librdkafka-dev \
+    # ext-soap
+    libxml2-dev \
     # ext-tidy
     libtidy-dev \
     # ext-zip
@@ -35,6 +37,7 @@ RUN apt-get update && \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure soap \
  && docker-php-ext-configure sockets \
  && docker-php-ext-configure tidy \
  && docker-php-ext-configure zip \
@@ -48,6 +51,7 @@ RUN apt-get update && \
     opcache \
     pcntl \
     pdo_mysql \
+    soap \
     sockets \
     tidy \
     zip \
