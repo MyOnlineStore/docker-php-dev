@@ -2,8 +2,11 @@ FROM php:7.4-rc-fpm-alpine
 
 ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
 
+COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
+
     # Install dependencies
-RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
+RUN chmod u+x /usr/local/bin/docker-php-ext-get \
+ && apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-gd
     freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libwebp-dev \
     # ext-gmp
@@ -27,41 +30,53 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
  && make -j$(nproc) install \
  && rm -rf /tmp/icu \
  && cd / \
+    # pre-fetch pecl extensions
+ && docker-php-source extract \
+ && docker-php-ext-get imagick 3.4.4 \
+ && docker-php-ext-get memcached 3.1.3 \
+ && docker-php-ext-get rdkafka 3.1.0 \
+ && docker-php-ext-get redis 4.3.0 \
+ && docker-php-ext-get xdebug 2.7.2 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
  && docker-php-ext-configure gmp \
+ && docker-php-ext-configure imagick \
  && docker-php-ext-configure intl \
+ && docker-php-ext-configure memcached \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure rdkafka \
+ && docker-php-ext-configure redis \
  && docker-php-ext-configure soap \
  && docker-php-ext-configure sockets \
     # Tidy 7.0 image workaround
  && if [ "7.4-rc" = "7.0" ]; then sed -i 's/buffio.h/tidybuffio.h/' /usr/src/php/ext/tidy/*.c;fi \
  && docker-php-ext-configure tidy \
+ && docker-php-ext-configure xdebug \
  && docker-php-ext-configure zip \
     # Install core extensions
  && docker-php-ext-install -j$(nproc) \
     bcmath \
     gd \
     gmp \
+    imagick \
     intl \
+    memcached \
     mysqli \
     opcache \
     pcntl \
     pdo_mysql \
+    rdkafka \
+    redis \
     soap \
     sockets \
     tidy \
+    xdebug \
     zip \
-    # Install pecl extensions
- && pecl install imagick \
- && pecl install memcached \
- && pecl install rdkafka \
- && pecl install redis \
- && pecl install xdebug \
+ && docker-php-source delete \
     # Install/Keep runtime dependencies
  && apk add --no-cache \
     $( \

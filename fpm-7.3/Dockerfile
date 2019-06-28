@@ -2,9 +2,12 @@ FROM php:7.3-fpm
 
 ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
 
+COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
+
     # Install dependencies
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
+RUN chmod u+x /usr/local/bin/docker-php-ext-get \
+ && apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
     # ext-gd
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
     # ext-gmp

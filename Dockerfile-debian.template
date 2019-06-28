@@ -2,9 +2,12 @@ FROM php:%%PHP_VERSION%%-fpm
 
 ARG ICU4C_SRC="%%LIBICU%%"
 
+COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
+
     # Install dependencies
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
+RUN chmod u+x /usr/local/bin/docker-php-ext-get \
+ && apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
     # ext-gd
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
     # ext-gmp
@@ -73,8 +76,6 @@ RUN apt-get update && \
  && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 binutils \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    # Remove PECL/package manager leftovers
- && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings

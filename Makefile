@@ -22,10 +22,10 @@ generate-alpine:
 	@echo Generating Dockerfile for fpm-$(PHP_VERSION)-alpine
 	@echo : PHP_VERSION=$(PHP_VERSION)
 	@echo : LIBICU=$(LIBICU)
-	@echo : TIDY_REPLACE=$(TIDY_REPLACE)
 ifeq ("$(wildcard fpm-$(PHP_VERSION)-alpine)", "")
 	@mkdir fpm-$(PHP_VERSION)-alpine
 endif
+	cp scripts/* fpm-$(PHP_VERSION)-alpine/
 	sed -r \
 		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!' \
 		-e 's!%%LIBICU%%!'$(LIBICU)'!' \
@@ -41,6 +41,7 @@ generate-debian:
 ifeq ("$(wildcard fpm-$(PHP_VERSION))", "")
 	@mkdir fpm-$(PHP_VERSION)
 endif
+	cp scripts/* fpm-$(PHP_VERSION)/
 	@sed -r \
 		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!' \
 		-e 's!%%LIBICU%%!'$(LIBICU)'!' \
