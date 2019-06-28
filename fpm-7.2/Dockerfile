@@ -22,11 +22,11 @@ RUN apt-get update && \
     # ext-zip
     libzip-dev \
     # Install libicu library
- && curl -L ${ICU4C_SRC} | tar xz -C /opt \
- && cd /opt/icu/source \
+ && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
+ && cd /tmp/icu/source \
  && ./runConfigureICU Linux/gcc \
  && make -j$(nproc) install \
- && rm -rf /opt/icu \
+ && rm -rf /tmp/icu \
  && cd / \
     # Configure extensions
  && docker-php-ext-configure bcmath \

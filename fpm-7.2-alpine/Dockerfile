@@ -21,11 +21,11 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-zip
     libzip-dev \
     # Install libicu library
- && curl -L ${ICU4C_SRC} | tar xz -C /opt \
- && cd /opt/icu/source \
+ && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
+ && cd /tmp/icu/source \
  && ./runConfigureICU Linux/gcc \
  && make -j$(nproc) install \
- && rm -rf /opt/icu \
+ && rm -rf /tmp/icu \
  && cd / \
     # Configure extensions
  && docker-php-ext-configure bcmath \
@@ -38,6 +38,8 @@ RUN apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
  && docker-php-ext-configure pdo_mysql \
  && docker-php-ext-configure soap \
  && docker-php-ext-configure sockets \
+    # Tidy 7.0 image workaround
+ && if [ "7.2" = "7.0" ]; then sed -i 's/buffio.h/tidybuffio.h/' /usr/src/php/ext/tidy/*.c;fi \
  && docker-php-ext-configure tidy \
  && docker-php-ext-configure zip \
     # Install core extensions

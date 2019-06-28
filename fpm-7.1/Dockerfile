@@ -1,6 +1,6 @@
-FROM php:7.3-fpm
+FROM php:7.1-fpm
 
-ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
+ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-55-2/icu4c-55_2-src.tgz"
 
     # Install dependencies
 RUN apt-get update && \
