@@ -31,40 +31,52 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && make -j$(nproc) install \
  && rm -rf /tmp/icu \
  && cd / \
+    # pre-fetch pecl extensions
+ && docker-php-source extract \
+ && docker-php-ext-get imagick 3.4.4 \
+ && docker-php-ext-get memcached 3.1.3 \
+ && docker-php-ext-get rdkafka 3.1.0 \
+ && docker-php-ext-get redis 4.3.0 \
+ && docker-php-ext-get xdebug 2.8.0alpha1 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
  && docker-php-ext-configure gmp \
+ && docker-php-ext-configure imagick \
  && docker-php-ext-configure intl \
+ && docker-php-ext-configure memcached \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure rdkafka \
+ && docker-php-ext-configure redis \
  && docker-php-ext-configure soap \
  && docker-php-ext-configure sockets \
  && docker-php-ext-configure tidy \
+ && docker-php-ext-configure xdebug \
  && docker-php-ext-configure zip \
     # Install core extensions
  && docker-php-ext-install -j$(nproc) \
     bcmath \
     gd \
     gmp \
+    imagick \
     intl \
+    memcached \
     mysqli \
     opcache \
     pcntl \
     pdo_mysql \
+    rdkafka \
+    redis \
     soap \
     sockets \
     tidy \
+    xdebug \
     zip \
-    # Install pecl extensions
- && pecl install imagick \
- && pecl install memcached \
- && pecl install rdkafka \
- && pecl install redis \
- && pecl install xdebug \
-    # Keep runtime dependencies
+ && docker-php-source delete \
+    # Install/Keep runtime dependencies
  && apt-mark auto '.*' > /dev/null \
  && find /usr/local -type f -executable -exec ldd '{}' ';' \
     | awk '/=>/ { print $(NF-1) }' \
@@ -76,8 +88,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 binutils \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    # Remove PECL/package manager leftovers
- && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings

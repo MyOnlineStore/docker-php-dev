@@ -36,7 +36,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-get memcached 3.1.3 \
  && docker-php-ext-get rdkafka 3.1.0 \
  && docker-php-ext-get redis 4.3.0 \
- && docker-php-ext-get xdebug 2.7.2 \
+ && docker-php-ext-get xdebug 2.8.0alpha1 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
@@ -87,8 +87,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     ) \
     # Remove build dependencies
  && apk del --no-network .build-deps \
-    # Remove PECL leftovers
- && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings

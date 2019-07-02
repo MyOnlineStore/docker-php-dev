@@ -87,8 +87,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     ) \
     # Remove build dependencies
  && apk del --no-network .build-deps \
-    # Remove PECL leftovers
- && rm -rf /tmp/pear ~/.pearrc \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings
