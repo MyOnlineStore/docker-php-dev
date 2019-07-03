@@ -40,6 +40,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-get xdebug 2.7.2 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
+ && docker-php-ext-configure exif \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
  && docker-php-ext-configure gmp \
  && docker-php-ext-configure imagick \
@@ -59,6 +60,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # Install core extensions
  && docker-php-ext-install -j$(nproc) \
     bcmath \
+    exif \
     gd \
     gmp \
     imagick \
