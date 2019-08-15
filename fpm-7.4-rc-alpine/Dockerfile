@@ -15,6 +15,8 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     imagemagick-dev libtool \
     # ext-memcached
     libmemcached-dev zlib-dev \
+    # ext-pdo_pgsql
+    postgresql-dev \
     # ext-rdkafka
     librdkafka-dev \
     # ext-soap
@@ -36,7 +38,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-get memcached 3.1.3 \
  && docker-php-ext-get rdkafka 3.1.0 \
  && docker-php-ext-get redis 4.3.0 \
- && docker-php-ext-get xdebug 2.8.0alpha1 \
+ && docker-php-ext-get xdebug 2.8.0beta1 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
@@ -49,6 +51,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
  && docker-php-ext-configure redis \
  && docker-php-ext-configure soap \
@@ -71,6 +74,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     opcache \
     pcntl \
     pdo_mysql \
+    pdo_pgsql \
     rdkafka \
     redis \
     soap \

@@ -16,6 +16,8 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libmagickwand-dev \
     # ext-memcached
     libmemcached-dev zlib1g-dev \
+    # ext-pdo_pgsql
+    libpq-dev \
     # ext-rdkafka
     librdkafka-dev \
     # ext-soap
@@ -37,7 +39,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-get memcached 3.1.3 \
  && docker-php-ext-get rdkafka 3.1.0 \
  && docker-php-ext-get redis 4.3.0 \
- && docker-php-ext-get xdebug 2.8.0alpha1 \
+ && docker-php-ext-get xdebug 2.8.0beta1 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
@@ -50,6 +52,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
  && docker-php-ext-configure pdo_mysql \
+ && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
  && docker-php-ext-configure redis \
  && docker-php-ext-configure soap \
@@ -70,6 +73,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     opcache \
     pcntl \
     pdo_mysql \
+    pdo_pgsql \
     rdkafka \
     redis \
     soap \
@@ -87,7 +91,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libmagickwand-6.q16-3 libc6 binutils \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default
