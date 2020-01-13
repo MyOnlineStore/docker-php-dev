@@ -1,4 +1,4 @@
-PHP_VERSIONS = 7.0 7.1 7.2 7.3 7.4-rc
+PHP_VERSIONS = 7.0 7.1 7.2 7.3 7.4
 
 MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
@@ -13,15 +13,15 @@ build: $(PHP_VERSIONS)
 	$(MAKE) -f $(MAKEFILE) -s generate
 
 7.2 7.3:
-	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz" \
+	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz" \
 	PHP_VERSION="$(@)" \
 	XDEBUG_VERSION="2.7.2" \
 	$(MAKE) -f $(MAKEFILE) -s generate
 
-7.4-rc:
-	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz" \
+7.4:
+	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz" \
 	PHP_VERSION="$(@)" \
-	XDEBUG_VERSION="2.8.0beta1" \
+	XDEBUG_VERSION="2.9.0" \
 	$(MAKE) -f $(MAKEFILE) -s generate
 
 generate: generate-alpine generate-debian
