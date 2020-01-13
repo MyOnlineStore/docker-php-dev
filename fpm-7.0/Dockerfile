@@ -26,8 +26,8 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libtidy-dev \
     # ext-zip
     libzip-dev \
-    # used for cgi-fcgi healthcheck in k8s containers
-    libfcgi \
+    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
+    libfcgi-bin \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
@@ -87,6 +87,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     zip \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
+    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
  && apt-mark auto '.*' > /dev/null \
  && find /usr/local -type f -executable -exec ldd '{}' ';' \
     | awk '/=>/ { print $(NF-1) }' \
@@ -95,7 +96,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default

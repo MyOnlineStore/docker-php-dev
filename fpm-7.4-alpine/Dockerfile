@@ -4,7 +4,7 @@ ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-65-1
 
 COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 
-    # Install dependencies
+# Build dependencies
 RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-gd
@@ -25,8 +25,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     tidyhtml-dev \
     # ext-zip
     libzip-dev \
-    # used for cgi-fcgi healthcheck in k8s containers
-    fcgi \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
@@ -88,6 +86,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     zip \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
+    # fcgi is used for cgi-fcgi healthcheck in k8s containers
  && apk add --no-cache \
     $( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
@@ -95,6 +94,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
         | sort -u \
         | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     ) \
+    fcgi \
     # Remove build dependencies
  && apk del --no-network .build-deps \
     # Disable all extensions by default
