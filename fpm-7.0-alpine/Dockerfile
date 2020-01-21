@@ -4,7 +4,7 @@ ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-55-2
 
 COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 
-    # Install dependencies
+# Build dependencies
 RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-gd
@@ -35,14 +35,15 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # pre-fetch pecl extensions
  && docker-php-source extract \
  && docker-php-ext-get imagick 3.4.4 \
- && docker-php-ext-get memcached 3.1.3 \
+ && docker-php-ext-get memcached 3.1.5 \
+ && if [ "7.0" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
  && docker-php-ext-get rdkafka 3.1.0 \
- && docker-php-ext-get redis 4.3.0 \
+ && docker-php-ext-get redis 5.1.1 \
  && docker-php-ext-get xdebug 2.7.2 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-configure gd `if [ "7.0" = "7.4" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
  && docker-php-ext-configure gmp \
  && docker-php-ext-configure imagick \
  && docker-php-ext-configure intl \
@@ -50,6 +51,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
+ && if [ "7.0" != "7.0" ]; then docker-php-ext-configure pcov ;fi \
  && docker-php-ext-configure pdo_mysql \
  && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
@@ -84,6 +86,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     zip \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
+    # fcgi is used for cgi-fcgi healthcheck in k8s containers
  && apk add --no-cache \
     $( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
@@ -91,6 +94,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
         | sort -u \
         | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     ) \
+    fcgi \
     # Remove build dependencies
  && apk del --no-network .build-deps \
     # Disable all extensions by default

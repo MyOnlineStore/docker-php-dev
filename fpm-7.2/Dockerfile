@@ -1,6 +1,6 @@
 FROM php:7.2-fpm
 
-ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
+ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz"
 
 COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 
@@ -26,6 +26,8 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libtidy-dev \
     # ext-zip
     libzip-dev \
+    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
+    libfcgi-bin \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
@@ -36,14 +38,15 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # pre-fetch pecl extensions
  && docker-php-source extract \
  && docker-php-ext-get imagick 3.4.4 \
- && docker-php-ext-get memcached 3.1.3 \
+ && docker-php-ext-get memcached 3.1.5 \
+ && if [ "7.2" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
  && docker-php-ext-get rdkafka 3.1.0 \
- && docker-php-ext-get redis 4.3.0 \
+ && docker-php-ext-get redis 5.1.1 \
  && docker-php-ext-get xdebug 2.7.2 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-configure gd `if [ "7.2" = "7.4" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
  && docker-php-ext-configure gmp \
  && docker-php-ext-configure imagick \
  && docker-php-ext-configure intl \
@@ -51,6 +54,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
+ && if [ "7.2" != "7.0" ]; then docker-php-ext-configure pcov;fi \
  && docker-php-ext-configure pdo_mysql \
  && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
@@ -83,6 +87,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     zip \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
+    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
  && apt-mark auto '.*' > /dev/null \
  && find /usr/local -type f -executable -exec ldd '{}' ';' \
     | awk '/=>/ { print $(NF-1) }' \
@@ -91,7 +96,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default
