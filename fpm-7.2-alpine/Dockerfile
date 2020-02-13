@@ -87,6 +87,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
     # fcgi is used for cgi-fcgi healthcheck in k8s containers
+    # ca-certifcates is used for outbound TLS connections by curl implementations
  && apk add --no-cache \
     $( \
         scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
@@ -95,6 +96,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
         | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
     ) \
     fcgi \
+    ca-certificates \
     # Remove build dependencies
  && apk del --no-network .build-deps \
     # Disable all extensions by default

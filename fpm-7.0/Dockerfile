@@ -8,6 +8,8 @@ COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
+    # ca-certifcates are used for outbound TLS connections by curl implementations
+    ca-certificates \
     # ext-gd
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
     # ext-gmp
@@ -88,6 +90,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
     # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
+    # ca-certifcates is used for outbound TLS connections by curl implementations
  && apt-mark auto '.*' > /dev/null \
  && find /usr/local -type f -executable -exec ldd '{}' ';' \
     | awk '/=>/ { print $(NF-1) }' \
@@ -96,7 +99,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin \
+ && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin ca-certificates \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default
