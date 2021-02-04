@@ -39,7 +39,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && if [ "7.3" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
  && docker-php-ext-get rdkafka 3.1.0 \
  && docker-php-ext-get redis 5.1.1 \
- && docker-php-ext-get xdebug 2.7.2 \
+ && docker-php-ext-get xdebug 3.0.2 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
