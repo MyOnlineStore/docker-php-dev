@@ -34,7 +34,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # Add librdkafka library
  && mkdir -p /tmp/librdkafka \
  && cd /tmp/librdkafka \
- && curl -L https://github.com/edenhill/librdkafka/archive/v1.6.0.tar.gz | tar xz --strip-components=1 \
+ && curl -L https://github.com/edenhill/librdkafka/archive/v1.2.1.tar.gz | tar xz --strip-components=1 \
  && ./configure && make && make install \
  && rm -rf /tmp/librdkafka \
     # pre-fetch pecl extensions
