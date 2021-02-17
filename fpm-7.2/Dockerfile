@@ -4,7 +4,7 @@ ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2
 
 COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 
-    # Install dependencies
+# Install dependencies
 RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
@@ -20,8 +20,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libmemcached-dev zlib1g-dev \
     # ext-pdo_pgsql
     libpq-dev \
-    # ext-rdkafka
-    librdkafka-dev \
     # ext-soap
     libxml2-dev \
     # ext-tidy
@@ -30,19 +28,27 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libzip-dev \
     # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
     libfcgi-bin \
+    # librdkafka
+    libssl-dev \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
  && ./runConfigureICU Linux/gcc \
  && make -j$(nproc) install \
  && rm -rf /tmp/icu \
- && cd / \
+    # Add librdkafka library
+ && mkdir -p /tmp/librdkafka \
+ && cd /tmp/librdkafka \
+ && curl -L https://github.com/edenhill/librdkafka/archive/v1.6.0.tar.gz | tar xz --strip-components=1 \
+ && ./configure && make && make install \
+ && rm -rf /tmp/librdkafka \
     # pre-fetch pecl extensions
+ && cd / \
  && docker-php-source extract \
  && docker-php-ext-get imagick 3.4.4 \
  && docker-php-ext-get memcached 3.1.5 \
  && if [ "7.2" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
- && docker-php-ext-get rdkafka 3.1.0 \
+ && docker-php-ext-get rdkafka 5.0.0 \
  && docker-php-ext-get redis 5.1.1 \
  && docker-php-ext-get xdebug 3.0.2 \
     # Configure extensions
@@ -99,7 +105,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual librdkafka1 libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin ca-certificates \
+ && apt-mark manual libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin ca-certificates \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default
