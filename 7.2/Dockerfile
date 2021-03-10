@@ -15,8 +15,6 @@ RUN set -xe && \
         libxml2-dev \
         # ext-imap
         libc-client2007e \
-        # pecl-rdkafka
-        librdkafka1 \
     " && \
     buildDeps=" \
         git \
@@ -51,8 +49,6 @@ RUN set -xe && \
         libmemcached-dev zlib1g-dev \
         # pecl-imagick \
         libmagickwand-dev \
-        # pecl-rdkafka \
-        librdkafka-dev \
     " && \
 
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install $buildDeps $requiredDeps nullmailer --no-install-recommends && \

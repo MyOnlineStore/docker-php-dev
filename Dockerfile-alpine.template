@@ -17,27 +17,33 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libmemcached-dev zlib-dev \
     # ext-pdo_pgsql
     postgresql-dev \
-    # ext-rdkafka
-    librdkafka-dev \
     # ext-soap
     libxml2-dev \
     # ext-tidy
     tidyhtml-dev \
     # ext-zip
     libzip-dev \
+    # librdkafka
+    openssl-dev \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
  && ./runConfigureICU Linux/gcc \
  && make -j$(nproc) install \
  && rm -rf /tmp/icu \
- && cd / \
+    # Add librdkafka library
+ && mkdir -p /tmp/librdkafka \
+ && cd /tmp/librdkafka \
+ && curl -L https://github.com/edenhill/librdkafka/archive/v1.6.0.tar.gz | tar xz --strip-components=1 \
+ && ./configure && make && make install \
+ && rm -rf /tmp/librdkafka \
     # pre-fetch pecl extensions
+ && cd / \
  && docker-php-source extract \
  && docker-php-ext-get imagick 3.4.4 \
  && docker-php-ext-get memcached 3.1.5 \
  && if [ "%%PHP_VERSION%%" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
- && docker-php-ext-get rdkafka 3.1.0 \
+ && docker-php-ext-get rdkafka 5.0.0 \
  && docker-php-ext-get redis 5.1.1 \
  && docker-php-ext-get xdebug %%XDEBUG_VERSION%% \
     # Configure extensions
