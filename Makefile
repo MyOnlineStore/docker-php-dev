@@ -1,4 +1,4 @@
-PHP_VERSIONS = 7.2 7.3 7.4 8.0
+PHP_VERSIONS = 7.2 7.4 8.0
 
 MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
@@ -6,16 +6,22 @@ MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 build: $(PHP_VERSIONS)
 
-7.2 7.3:
+7.2:
 	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz" \
 	PHP_VERSION="$(@)" \
-	XDEBUG_VERSION="3.0.2" \
+	XDEBUG_VERSION="3.0.3" \
 	$(MAKE) -f $(MAKEFILE) -s generate
 
 7.4:
 	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-65-1/icu4c-65_1-src.tgz" \
 	PHP_VERSION="$(@)" \
-	XDEBUG_VERSION="3.0.2" \
+	XDEBUG_VERSION="3.0.3" \
+	$(MAKE) -f $(MAKEFILE) -s generate
+
+8.0:
+	@LIBICU="https://github.com/unicode-org/icu/releases/download/release-68-2/icu4c-68_2-src.tgz" \
+	PHP_VERSION="$(@)" \
+	XDEBUG_VERSION="3.0.3" \
 	$(MAKE) -f $(MAKEFILE) -s generate
 
 generate: generate-alpine generate-debian
@@ -30,9 +36,9 @@ ifeq ("$(wildcard fpm-$(PHP_VERSION)-alpine)", "")
 endif
 	cp scripts/* fpm-$(PHP_VERSION)-alpine/
 	sed -r \
-		-e 's!%%LIBICU%%!'$(LIBICU)'!' \
-		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!' \
-		-e 's!%%XDEBUG_VERSION%%!'$(XDEBUG_VERSION)'!' \
+		-e 's!%%LIBICU%%!'$(LIBICU)'!g' \
+		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!g' \
+		-e 's!%%XDEBUG_VERSION%%!'$(XDEBUG_VERSION)'!g' \
 		Dockerfile-alpine.template \
 		> fpm-$(PHP_VERSION)-alpine/Dockerfile
 	@docker build --pull --tag myonlinestore/php:fpm-$(PHP_VERSION)-alpine fpm-$(PHP_VERSION)-alpine
@@ -48,9 +54,9 @@ ifeq ("$(wildcard fpm-$(PHP_VERSION))", "")
 endif
 	cp scripts/* fpm-$(PHP_VERSION)/
 	@sed -r \
-		-e 's!%%LIBICU%%!'$(LIBICU)'!' \
-		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!' \
-		-e 's!%%XDEBUG_VERSION%%!'$(XDEBUG_VERSION)'!' \
+		-e 's!%%LIBICU%%!'$(LIBICU)'!g' \
+		-e 's!%%PHP_VERSION%%!'$(PHP_VERSION)'!g' \
+		-e 's!%%XDEBUG_VERSION%%!'$(XDEBUG_VERSION)'!g' \
 		Dockerfile-debian.template \
 		> fpm-$(PHP_VERSION)/Dockerfile
 	@docker build --pull --tag myonlinestore/php:fpm-$(PHP_VERSION) fpm-$(PHP_VERSION)

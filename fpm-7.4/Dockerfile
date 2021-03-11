@@ -16,8 +16,6 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libgmp-dev \
     # ext-imagick
     libmagickwand-dev \
-    # ext-memcached
-    libmemcached-dev zlib1g-dev \
     # ext-pdo_pgsql
     libpq-dev \
     # ext-soap
@@ -45,24 +43,22 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # pre-fetch pecl extensions
  && cd / \
  && docker-php-source extract \
- && docker-php-ext-get imagick 3.4.4 \
- && docker-php-ext-get memcached 3.1.5 \
- && if [ "7.4" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
+ && if [ "7.4" != "8.0" ]; then echo docker-php-ext-get imagick 3.4.4 ;fi \
+ && docker-php-ext-get pcov 1.0.6 \
  && docker-php-ext-get rdkafka 5.0.0 \
- && docker-php-ext-get redis 5.1.1 \
- && docker-php-ext-get xdebug 3.0.2 \
+ && docker-php-ext-get redis 5.3.3 \
+ && docker-php-ext-get xdebug 3.0.3 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
- && docker-php-ext-configure gd `if [ "7.4" = "7.4" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
+ && docker-php-ext-configure gd `if [ "7.4" = "7.4" ] || [ "7.4" = "8.0" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
  && docker-php-ext-configure gmp \
- && docker-php-ext-configure imagick \
+ && if [ "7.4" != "8.0" ]; then echo docker-php-ext-configure imagick ;fi \
  && docker-php-ext-configure intl \
- && docker-php-ext-configure memcached \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
- && if [ "7.4" != "7.0" ]; then docker-php-ext-configure pcov;fi \
+ && docker-php-ext-configure pcov \
  && docker-php-ext-configure pdo_mysql \
  && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
@@ -78,9 +74,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     exif \
     gd \
     gmp \
-    imagick \
     intl \
-    memcached \
     mysqli \
     opcache \
     pcntl \
@@ -93,6 +87,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     tidy \
     xdebug \
     zip \
+ && if [ "7.4" != "8.0" ]; then echo docker-php-ext-install imagick ;fi \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
     # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
@@ -105,7 +100,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     | cut -d: -f1 \
     | sort -u \
     | xargs -r apt-mark manual \
- && apt-mark manual libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin ca-certificates \
+ && apt-mark manual libc6 binutils libfcgi-bin ca-certificates \
     # Remove build dependencies
  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     # Disable all extensions by default

@@ -1,35 +1,28 @@
-FROM php:7.3-fpm
+FROM php:8.0-fpm-alpine
 
-ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-64-2/icu4c-64_2-src.tgz"
+ARG ICU4C_SRC="https://github.com/unicode-org/icu/releases/download/release-68-2/icu4c-68_2-src.tgz"
 
 COPY docker-php-ext-get /usr/local/bin/docker-php-ext-get
 
-# Install dependencies
+# Build dependencies
 RUN chmod u+x /usr/local/bin/docker-php-ext-get \
- && apt-get update \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${PHPIZE_DEPS} \
-    # ca-certifcates are used for outbound TLS connections by curl implementations
-    ca-certificates \
+ && apk add --no-cache --virtual .build-deps ${PHPIZE_DEPS} \
     # ext-gd
-    libpng-dev libjpeg62-turbo-dev libfreetype6-dev zlib1g-dev libwebp-dev \
+    freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libwebp-dev \
     # ext-gmp
-    libgmp-dev \
+    gmp-dev \
     # ext-imagick
-    libmagickwand-dev \
-    # ext-memcached
-    libmemcached-dev zlib1g-dev \
+    imagemagick-dev libtool \
     # ext-pdo_pgsql
-    libpq-dev \
+    postgresql-dev \
     # ext-soap
     libxml2-dev \
     # ext-tidy
-    libtidy-dev \
+    tidyhtml-dev \
     # ext-zip
     libzip-dev \
-    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
-    libfcgi-bin \
     # librdkafka
-    libssl-dev \
+    openssl-dev \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
@@ -45,24 +38,22 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # pre-fetch pecl extensions
  && cd / \
  && docker-php-source extract \
- && docker-php-ext-get imagick 3.4.4 \
- && docker-php-ext-get memcached 3.1.5 \
- && if [ "7.3" != "7.0" ]; then docker-php-ext-get pcov 1.0.6;fi \
+ && if [ "8.0" != "8.0" ]; then echo docker-php-ext-get imagick 3.4.4 ;fi \
+ && docker-php-ext-get pcov 1.0.6 \
  && docker-php-ext-get rdkafka 5.0.0 \
- && docker-php-ext-get redis 5.1.1 \
- && docker-php-ext-get xdebug 3.0.2 \
+ && docker-php-ext-get redis 5.3.3 \
+ && docker-php-ext-get xdebug 3.0.3 \
     # Configure extensions
  && docker-php-ext-configure bcmath \
  && docker-php-ext-configure exif \
- && docker-php-ext-configure gd `if [ "7.3" = "7.4" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
+ && docker-php-ext-configure gd `if [ "8.0" = "7.4" ] || [ "8.0" = "8.0" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
  && docker-php-ext-configure gmp \
- && docker-php-ext-configure imagick \
+ && if [ "8.0" != "8.0" ]; then echo docker-php-ext-configure imagick ;fi \
  && docker-php-ext-configure intl \
- && docker-php-ext-configure memcached \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
  && docker-php-ext-configure pcntl \
- && if [ "7.3" != "7.0" ]; then docker-php-ext-configure pcov;fi \
+ && docker-php-ext-configure pcov \
  && docker-php-ext-configure pdo_mysql \
  && docker-php-ext-configure pdo_pgsql \
  && docker-php-ext-configure rdkafka \
@@ -78,9 +69,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     exif \
     gd \
     gmp \
-    imagick \
     intl \
-    memcached \
     mysqli \
     opcache \
     pcntl \
@@ -93,21 +82,22 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     tidy \
     xdebug \
     zip \
+ && if [ "8.0" != "8.0" ]; then echo docker-php-ext-install imagick ;fi \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
-    # libfcgi-bin is used for cgi-fcgi healthcheck in k8s containers
+    # fcgi is used for cgi-fcgi healthcheck in k8s containers
     # ca-certifcates is used for outbound TLS connections by curl implementations
- && apt-mark auto '.*' > /dev/null \
- && find /usr/local -type f -executable -exec ldd '{}' ';' \
-    | awk '/=>/ { print $(NF-1) }' \
-    | sort -u \
-    | xargs -r dpkg-query --search \
-    | cut -d: -f1 \
-    | sort -u \
-    | xargs -r apt-mark manual \
- && apt-mark manual libmemcached11 libmemcachedutil2 libc6 binutils libfcgi-bin ca-certificates \
+ && apk add --no-cache \
+    $( \
+        scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+        | tr ',' '\n' \
+        | sort -u \
+        | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    ) \
+    fcgi \
+    ca-certificates \
     # Remove build dependencies
- && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+ && apk del --no-network .build-deps \
     # Disable all extensions by default
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings
