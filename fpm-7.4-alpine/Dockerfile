@@ -38,7 +38,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     # pre-fetch pecl extensions
  && cd / \
  && docker-php-source extract \
- && if [ "7.4" != "8.0" ]; then echo docker-php-ext-get imagick 3.4.4 ;fi \
+ && if [ "7.4" != "8.0" ]; then docker-php-ext-get imagick 3.4.4 ;fi \
  && docker-php-ext-get pcov 1.0.6 \
  && docker-php-ext-get rdkafka 5.0.0 \
  && docker-php-ext-get redis 5.3.3 \
@@ -48,7 +48,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && docker-php-ext-configure exif \
  && docker-php-ext-configure gd `if [ "7.4" = "7.4" ] || [ "7.4" = "8.0" ]; then echo "--with-freetype --with-jpeg"; else echo "--with-freetype-dir=/usr/include/ --with-png-dir=/usr/include/ --with-jpeg-dir=/usr/include/";fi` \
  && docker-php-ext-configure gmp \
- && if [ "7.4" != "8.0" ]; then echo docker-php-ext-configure imagick ;fi \
+ && if [ "7.4" != "8.0" ]; then docker-php-ext-configure imagick ;fi \
  && docker-php-ext-configure intl \
  && docker-php-ext-configure mysqli \
  && docker-php-ext-configure opcache \
@@ -82,7 +82,7 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     tidy \
     xdebug \
     zip \
- && if [ "7.4" != "8.0" ]; then echo docker-php-ext-install imagick ;fi \
+ && if [ "7.4" != "8.0" ]; then docker-php-ext-install imagick ;fi \
  && docker-php-source delete \
     # Install/Keep runtime dependencies
     # fcgi is used for cgi-fcgi healthcheck in k8s containers
