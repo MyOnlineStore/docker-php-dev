@@ -36,8 +36,9 @@ jobs:
 
     - name: Build and Push Docker images
       run: |
+        # Loop through folders that has changed
         for changed_folder in `git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | cut -d'/' -f1 | sort -u`; do
-          if [ -d "$changed_folder" ]; then
+          if [ -d "$changed_folder" ] && [ "$changed_folder" != "scripts" ] && [ "$changed_folder" != ".github" ] ; then
             image_name="dev-$(echo "$changed_folder" | cut -d'-' -f1)"
             tag="$(echo "$changed_folder" | cut -d'-' -f2-)"
             image="$DOCKER_REPOSITORY/$GCP_PROJECT/$image_name:$tag"
