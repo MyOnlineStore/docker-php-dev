@@ -107,3 +107,4 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
  && rm ${PHP_INI_DIR}/conf.d/docker-php-ext-*.ini \
     # Make the production.ini the default settings
  && mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
+
