@@ -1,0 +1,50 @@
+name: Build docker images and push to Google Container Registry
+
+on:
+  push:
+    branches:
+    - master
+
+env:
+  GCP_PROJECT: myonlinestore-dev
+  DOCKER_REPOSITORY: eu.gcr.io
+  GITHUB_SHA: ${{ github.sha }}
+  GITHUB_REF: ${{ github.ref }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup gcloud develop CLI
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        version: '270.0.0'
+        service_account_key: ${{ secrets.GKE_DEVELOP_KEY }}
+
+    # Configure docker to use the gcloud command-line tool as a credential helper
+    - name: Setup docker authentication
+      run: |
+        # Set up docker to authenticate
+        # via gcloud command-line tool.
+        gcloud auth configure-docker
+
+    - name: Build and Push Docker images
+      run: |
+        # Loop through folders that has changed
+        for changed_folder in `git diff --name-only ${{ github.event.before }}..${{ github.event.after }} | cut -d'/' -f1 | sort -u`; do
+          if [ -d "$changed_folder" ] && [ "$changed_folder" != "scripts" ] && [ "$changed_folder" != ".github" ] ; then
+            image_name="dev-$(echo "$changed_folder" | cut -d'-' -f1)"
+            tag="$(echo "$changed_folder" | cut -d'-' -f2-)"
+            image="$DOCKER_REPOSITORY/$GCP_PROJECT/$image_name:$tag"
+
+            echo "Build and push image $image"
+            docker build -t $image --label GITHUB_SHA="$GITHUB_SHA" --label GITHUB_REF="$GITHUB_REF" $changed_folder
+            docker push $image
+          fi
+        done
