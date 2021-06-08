@@ -23,6 +23,12 @@ RUN chmod u+x /usr/local/bin/docker-php-ext-get \
     libzip-dev \
     # librdkafka
     openssl-dev \
+    # Install supercronic
+ && curl -fsSLO "https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64" \
+ && echo "048b95b48b708983effb2e5c935a1ef8483d9e3e  supercronic-linux-amd64" | sha1sum -c - \
+ && chmod +x "supercronic-linux-amd64" \
+ && mv "supercronic-linux-amd64" "/usr/local/bin/supercronic-linux-amd64" \
+ && ln -s "/usr/local/bin/supercronic-linux-amd64" /usr/local/bin/supercronic \
     # Install libicu library
  && curl -L ${ICU4C_SRC} | tar xz -C /tmp \
  && cd /tmp/icu/source \
